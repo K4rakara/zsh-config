@@ -1,8 +1,8 @@
 #!/bin/zsh
 
-mkdir -p /tmp/zsh;
+mkdir -p "${XDG_RUNTIME_DIR}/zsh";
 
-HISTFILE="/tmp/zsh/history";
+HISTFILE="${XDG_RUNTIME_DIR}/zsh/history";
 HISTSIZE="1000";
 SAVEHIST="1000";
 
