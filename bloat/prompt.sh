@@ -19,7 +19,9 @@ function __prompt {
   __PROMPT_GIT="";
   
   function __prompt_context_setup {
-    __PROMPT_CONTEXT=" %B%n%F{blue}@%M%f%b ";
+    local WHOAMI="$(whoami)";
+    [[ "${WHOAMI}" == "root" ]] && WHOAMI="%F{red}${WHOAMI}%f";
+    __PROMPT_CONTEXT=" %B${WHOAMI}%F{blue}@%M%f%b ";
   }
   
   function __prompt_sandbox_setup {
