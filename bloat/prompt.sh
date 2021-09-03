@@ -37,7 +37,7 @@ function __prompt {
     
     if __in_git_directory
     then
-      __PROMPT_GIT="%F{yellow}󰊢 %f ";
+      __PROMPT_GIT="%F{yellow}$(git rev-parse --abbrev-ref HEAD)%f ";
     else
       __PROMPT_GIT="";
     fi
