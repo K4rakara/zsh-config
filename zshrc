@@ -1,3 +1,4 @@
+#!/bin/zsh
 
 for FILE in /etc/zsh/bloat/*.sh
 do
