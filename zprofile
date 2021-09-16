@@ -10,7 +10,6 @@ source <(\
 
 export CARGO_HOME="${HOME}/.opt/cargo";
 export EDITOR="nvim";
-export LC_ALL="en_US.UTF-8";
 export PATH="${HOME}/.local/bin:${PATH}";
 export RUSTUP_HOME="${HOME}/.opt/rustup";
 export WINEPREFIX="${HOME}/.opt/wine";
