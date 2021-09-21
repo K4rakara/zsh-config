@@ -6,6 +6,7 @@ function sandbox {
   local NO_REUSE_ROOT=false;
   local BINDS=();
   local TAKEOVER=false;
+  local DISPLAY=false;
   local PROGRAM='';
   
   while true
@@ -24,6 +25,7 @@ Options:
   --no-reuse-root: Disallow sandbox from reusing one of the automatically generated root directories for the same executable.
   --bind <SRC> <DST>: Bind SRC on the host to DST in the sandbox.
   --takeover: Use the exec command to dissolve the zsh process once bwrap has been run.
+  --display: display the generated bwrap command intead of executing it. Mutually exclusive with --takeover.
 EOF
           return 0;
           ;;
@@ -44,6 +46,9 @@ EOF
         '--takeover' )
           TAKEOVER=true;
           ;;
+        '--display' )
+          DISPLAY=true;
+          ;;
         '--'* )
           echo "Unrecognized option '${1}'.";
           return 1;
@@ -63,7 +68,14 @@ EOF
     (( ${#} < 1 )) && break;
     shift 1;
   done
-
+  
+  if [[ ${TAKEOVER} == true ]] \
+  && [[ ${DISPLAY} == true ]]
+  then
+    echo "--takeover and --display are mutually exclusive.";
+    return 1;
+  fi
+  
   if [[ -z "${ROOT}" ]]
   then
     [[ -z "${XDG_RUNTIME_DIR}" ]] \
@@ -97,7 +109,6 @@ EOF
           if [[ "${PROGRAM_EXECUTABLE}" == "${TMP[1]}" ]]
           then
             ID="${TMP[2]}";
-            echo "${ID}";
             break;
           fi
         done
@@ -146,6 +157,7 @@ EOF
   COMMAND+=" --bind '${ROOT}' /";
   COMMAND+=" --ro-bind /usr /usr";
   COMMAND+=" --ro-bind /etc /etc";
+  COMMAND+=" --bind /run /run";
   COMMAND+=" --proc /proc";
   COMMAND+=" --dev /dev";
   COMMAND+=" --ro-bind '/home/${USER}/.config/gtk-3.0' '/home/${USER}/.config/gtk-3.0'";
@@ -153,10 +165,16 @@ EOF
   COMMAND+=" --ro-bind '/home/${USER}/.zshrc' '/home/${USER}/.zshrc'";
   COMMAND+=" --ro-bind '/home/${USER}/.zprofile' '/home/${USER}/.zprofile'";
   
-  for (( I=0; I<${#BINDS[@]}; i+=2 ))
+  for (( I=1; I<${#BINDS[@]}; I+=2 ))
   do
     COMMAND+=" --bind '${BINDS[${I}]}' '${BINDS[$((${I} + 1))]}'";
   done
+  
+  if [[ ${DISPLAY} == true ]]
+  then
+    echo "${COMMAND} ${PROGRAM}";
+    return 0;
+  fi
   
   [[ ${TAKEOVER} == true ]] \
     && eval exec ${COMMAND} ${PROGRAM} \
