@@ -136,7 +136,6 @@ EOF
   then
     mkdir -p "${ROOT}";
     mkdir -p "${ROOT}/home";
-    mkdir -p "${ROOT}/tmp";
     mkdir -p "${ROOT}/usr";
     mkdir -p "${ROOT}/var";
     
@@ -158,6 +157,7 @@ EOF
   COMMAND+=" --ro-bind /usr /usr";
   COMMAND+=" --ro-bind /etc /etc";
   COMMAND+=" --bind /run /run";
+  COMMAND+=" --bind /tmp /tmp";
   COMMAND+=" --proc /proc";
   COMMAND+=" --dev /dev";
   COMMAND+=" --ro-bind '/home/${USER}/.config/gtk-3.0' '/home/${USER}/.config/gtk-3.0'";
