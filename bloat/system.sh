@@ -6,6 +6,8 @@ function shutdown { sudo /usr/bin/systemctl poweroff; }
 
 function reboot { sudo /usr/bin/systemctl reboot; }
 
+function unlock { su -c faillock --user "$(whoami)" --reset; }
+
 function flatpak {
   if [[ "${1}" == "install" ]] \
   || [[ "${1}" == "uninstall" ]] \
