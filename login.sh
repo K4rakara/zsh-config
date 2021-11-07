@@ -1,7 +1,7 @@
 #!/bin/zsh
 
-if [[ "$(cat /etc/os-release 2>/dev/null)" == *"archlinux"* ]]
-then
+case "$(cat /etc/os-release 2>/dev/null)" in
+  *"archlinux"* )
     cat <<-EOF
 
      [36m      /\\
@@ -13,7 +13,9 @@ then
      [34m/_-''    ''-_\\[0m
 
 EOF
-else
+    ;;
+  "" ) ;;
+  * )
   cat <<-EOF
      [34m     ___
          |[0m.. [34m|
@@ -24,7 +26,8 @@ else
       \\_/[0;34m____[33;1m\\_/[0m
     
 EOF
-fi
+    ;;
+esac
 
 echo "Welcome to [34;1m${HOST}[0m, [1m${USER}[0m.";
 echo;
