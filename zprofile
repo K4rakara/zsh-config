@@ -2,7 +2,7 @@
 
 emulate sh -c 'source /etc/profile';
 
-source <(\
+$(\
     cat "${HOME}/.config/user-dirs.dirs" \
   | sed 's/^/export /' \
   | sed 's/$/;/' \
@@ -14,7 +14,7 @@ export PATH="${HOME}/.local/bin:${PATH}";
 export RUSTUP_HOME="${HOME}/.opt/rustup";
 export WINEPREFIX="${HOME}/.opt/wine";
 
-[[ -e "${HOME}/.env" ]] && source <(
+[[ -e "${HOME}/.env" ]] && $(
     cat "${HOME}/.env" \
   | sed 's/^/export /' \
   | sed 's/$/;/' \
