@@ -24,27 +24,41 @@ then
   function pacman {
     local CONTAINED_VERSION_FLAG=false;
     local CONTAINED_HELP_FLAG=false;
+    local CONTAINED_SYNC_FLAG=false;
+    local CONTAINED_REFRESH_FLAG=false;
+    local CONTAINED_UPGRADE_FLAG=false;
     local CONTAINED_FULL_UPGRADE_FLAGS=false;
     local CONTAINED_RESTORE_FLAG=false;
     
     for FLAG in ${@}
     do
-      [[ "${FLAG}" == '--version' ]] \
-      || [[ "${FLAG}" == '-V' ]] \
-      && CONTAINED_VERSION_FLAG=true;
+      [[ "${FLAG}" == '--version' ]] || [[ "${FLAG}" == '-V' ]] \
+        && CONTAINED_VERSION_FLAG=true;
       
-      [[ "${FLAG}" == '--help' ]] \
-      || [[ "${FLAG}" == '-H' ]] \
-      && CONTAINED_HELP_FLAG=true;
+      [[ "${FLAG}" == '--help' ]] || [[ "${FLAG}" == '-H' ]] \
+        && CONTAINED_HELP_FLAG=true \
+        || CONTAINED_HELP_FLAG=false; # Prevent overriding of contextual --help
+
+      [[ "${FLAG}" == '--sync' ]] && CONTAINED_SYNC_FLAG=true;
+      
+      [[ ${CONTAINED_SYNC_FLAG} == true ]] && [[ "${FLAG}" == '--refresh' ]] \
+        && CONTAINED_REFRESH_FLAG=true;
+      
+      [[ ${CONTAINED_SYNC_FLAG} == true ]] && [[ "${FLAG}" == '--upgrade' ]] \
+        && CONTAINED_UPGRADE_FLAG=true;
       
       [[ "${FLAG}" == '-'*'S'* ]] \
       && [[ "${FLAG}" == '-'*'y'* ]] \
       && [[ "${FLAG}" == '-'*'u'* ]] \
-      && CONTAINED_FULL_UPGRADE_FLAGS=true;
-      
-      [[ "${FLAG}" == "-Z"* ]] \
-      && CONTAINED_RESTORE_FLAG=true;
+        && CONTAINED_FULL_UPGRADE_FLAGS=true;
+
+      [[ "${FLAG}" == '-Z'* ]] || [[ "${FLAG}" == '--restore' ]] && CONTAINED_RESTORE_FLAG=true;
     done
+    
+    [[ ${CONTAINED_SYNC_FLAG} == true ]] \
+    && [[ ${CONTAINED_REFRESH_FLAG} == true ]] \
+    && [[ ${CONTAINED_UPGRADE_FLAG} == true ]] \
+    && CONTAINED_FULL_UPGRADE_FLAGS=true;
     
     if [[ ${CONTAINED_VERSION_FLAG} == true ]]
     then
@@ -55,7 +69,7 @@ then
     then
       /usr/bin/paru --help \
         | sed 's/paru/pacman/g' \
-        | sed 's/\(.*getpkgbuild.*\)/\1\n    pacman {-Z --restore}     [options] [package(s)]/';
+        | sed 's/\(.*getpkgbuild[^:]*\)/\1\n    pacman {-Z --restore}     [options] [package(s)]/';
     elif [[ ${CONTAINED_FULL_UPGRADE_FLAGS} == true ]]
     then
       /usr/bin/paru -Qm > "${HOME}/.cache/paru/prev-aur-package-versions";
