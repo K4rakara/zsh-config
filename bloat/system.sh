@@ -33,7 +33,7 @@ function cisco-is-fun {
     DEVICES+=("${DEVICE}");
   done
   
-  if (( ${} == 0 ))
+  if (( ${#DEVICES[@]} == 0 ))
   then
     echo "Error: No devices availible.";
     return 2;
