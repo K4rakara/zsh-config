@@ -8,6 +8,62 @@ function reboot { sudo /usr/bin/systemctl reboot; }
 
 function unlock { su -c faillock --user "$(whoami)" --reset; }
 
+function cisco-is-fun {
+  case "$(cat '/etc/os-release' 2>/dev/null)" in
+    *'archlinux'* )
+      if [[ ! -e '/usr/bin/minicom' ]] \
+      || (( $(groups | grep -o 'uucp' | wc -c) != 0 ))
+      then
+        echo "Error: Minicom is not installed, or this user is not in the uucp group.";
+        return 1;
+      fi
+      ;;
+    * )
+      echo "Warning: Unknown distro. Unable to preemptively check if this command can be ran.";
+      ;;
+  esac
+  
+  local I=0;
+  local DEVICE='';
+  local DEVICES=();
+  
+  ls '/dev' | grep -oP '(ttyUSB\d+|ttyACM\d+)' | while read DEVICE
+  do
+    I=$((${I} + 1));
+    DEVICES+=("${DEVICE}");
+  done
+  
+  if (( ${} == 0 ))
+  then
+    echo "Error: No devices availible.";
+    return 2;
+  fi
+  
+  echo "Pick a device:";
+  
+  I=0;
+  
+  for DEVICE in ${DEVICES[@]}
+  do
+    I=$((${I} + 1));
+    echo "${I}. ${DEVICE}";
+  done
+
+  while true
+  do
+    read DEVICE;
+    if (( $(echo "${DEVICE}" | grep -oP '$\d+^' | wc -c) == 0 )) \
+    || (( ${DEVICE} > ${#DEVICES[@]} ))
+    then
+      printf "\x1b[2K\x1b[1A";
+    else
+      break
+    fi
+  done
+
+  minicom -D "/dev/${DEVICES[${DEVICE}]}" -b 9600;
+}
+
 function flatpak {
   if [[ "${1}" == "install" ]] \
   || [[ "${1}" == "uninstall" ]] \
